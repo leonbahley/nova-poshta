@@ -1,7 +1,9 @@
 import { Nav, Navbar, NavLink, Container } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Navigation() {
+  const { pathname } = useLocation();
+
   return (
     <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
       <Container className="px-10px mx-0">
@@ -11,7 +13,10 @@ export default function Navigation() {
           data-bs-target="#navbarScroll"
         />
         <Navbar.Collapse id="navbarScroll">
-          <Nav style={{ marginLeft: "20px" }} defaultActiveKey="1">
+          <Nav
+            style={{ marginLeft: "20px" }}
+            defaultActiveKey={pathname === "/" ? "1" : "2"}
+          >
             <NavLink eventKey="1" as={Link} to="/">
               Tracking package
             </NavLink>
