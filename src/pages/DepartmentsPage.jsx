@@ -28,6 +28,7 @@ export default function DepartmentsPage() {
           },
         },
       });
+      setError(null);
       return res.data.data;
     } catch (error) {
       setError("Something went wrong");
@@ -67,7 +68,11 @@ export default function DepartmentsPage() {
             style={{ width: "300px" }}
           >
             <Form.Group className="mb-3" controlId="input">
-              <Form.Control type="text" placeholder="Enter city name" />
+              <Form.Control
+                required
+                type="text"
+                placeholder="Enter city name"
+              />
             </Form.Group>
             <Button variant="primary" type="submit">
               Search
