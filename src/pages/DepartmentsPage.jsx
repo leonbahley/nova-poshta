@@ -10,6 +10,7 @@ export default function DepartmentsPage() {
   const [cityQuery, setCityQuery] = useState("");
   const [departments, setDepartments] = useState([]);
   const [error, setError] = useState(null);
+  const [areNoDepartmants, setAreNoDeaprtmants] = useState(false);
 
   const searchDepartments = async () => {
     try {
@@ -34,19 +35,23 @@ export default function DepartmentsPage() {
   };
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
+    setAreNoDeaprtmants(false);
     setPage(1);
     setCityQuery(event.target.elements["input"].value);
     setDepartments([]);
-    event.preventDefault();
   };
 
   useEffect(() => {
     if (!cityQuery) {
       return;
     }
-    searchDepartments().then((res) =>
-      setDepartments((prev) => [...prev, ...res])
-    );
+    searchDepartments().then((res) => {
+      if (!res.length) {
+        setAreNoDeaprtmants(true);
+      }
+      setDepartments((prev) => [...prev, ...res]);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, cityQuery]);
 
@@ -68,23 +73,26 @@ export default function DepartmentsPage() {
               Search
             </Button>
           </Form>
-          <ListGroup>
-            {departments &&
-              departments.map(({ SiteKey, Description }) => (
-                <ListGroup.Item key={SiteKey}>
-                  <p>{Description}</p>
-                </ListGroup.Item>
-              ))}
-          </ListGroup>
+          {areNoDepartmants && <p>There are no departments</p>}
           {departments.length !== 0 && (
-            <Button
-              onClick={() => setPage((prev) => prev + 1)}
-              className="mt-2"
-              variant="primary"
-              type="button"
-            >
-              See more
-            </Button>
+            <>
+              <ListGroup>
+                {departments.map(({ SiteKey, Description }) => (
+                  <ListGroup.Item key={SiteKey}>
+                    <p>{Description}</p>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+
+              <Button
+                onClick={() => setPage((prev) => prev + 1)}
+                className="mt-2"
+                variant="primary"
+                type="button"
+              >
+                See more
+              </Button>
+            </>
           )}
         </>
       )}
