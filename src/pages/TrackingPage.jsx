@@ -4,12 +4,14 @@ import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
 import ClipLoader from "react-spinners/ClipLoader";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+axios.defaults.baseURL = "http://localhost:3000/api/ttn";
 export default function TrackingPage() {
   const [error, setError] = useState(null);
   const [packageInfo, setPackageInfo] = useState();
   const [isSpinnerVisible, setIsSpinnerVisible] = useState(false);
+  const [ttns, setTtns] = useState([]);
 
   const trackPackage = async (num) => {
     setIsSpinnerVisible(true);
@@ -42,10 +44,45 @@ export default function TrackingPage() {
     }
   };
 
+  const searchFromHistory = (num) => {
+    trackPackage(num);
+    setTtns((prev) => [...prev, { ttn: num }]);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const num = e.target.elements["input"].value;
     trackPackage(num);
+    addTtn(num);
+    setTtns((prev) => [...prev, { ttn: num }]);
+  };
+
+  const getTtns = async () => {
+    try {
+      setIsSpinnerVisible(true);
+      const res = await axios.get("/");
+      setTtns(res.data);
+    } catch (error) {
+    } finally {
+      setIsSpinnerVisible(false);
+    }
+  };
+
+  const addTtn = async (ttn) => {
+    try {
+      await axios.post("/", { ttn });
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getTtns();
+  }, []);
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete("/");
+      setTtns([]);
+    } catch (error) {}
   };
 
   return (
@@ -98,12 +135,27 @@ export default function TrackingPage() {
       </Container>
       <Container style={{ width: "300px" }} className="d-flex flex-column mx-0">
         <h3>History</h3>
+        {ttns.length !== 0 && (
+          <Button
+            onClick={handleDelete}
+            style={{ width: "90px", marginBottom: "5px" }}
+            variant="primary"
+            type="button"
+          >
+            Delete
+          </Button>
+        )}
         <ListGroup>
-          <ListGroup.Item>Cras justo odio</ListGroup.Item>
-          <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-          <ListGroup.Item>Morbi leo risus</ListGroup.Item>
-          <ListGroup.Item>Porta ac consectetur ac</ListGroup.Item>
-          <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+          {isSpinnerVisible && <ClipLoader />}
+          {ttns?.map(({ ttn }, i) => (
+            <ListGroup.Item
+              style={{ cursor: "pointer" }}
+              onClick={() => searchFromHistory(ttn)}
+              key={i}
+            >
+              {ttn}
+            </ListGroup.Item>
+          ))}
         </ListGroup>
       </Container>
     </Container>
