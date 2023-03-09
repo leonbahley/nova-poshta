@@ -6,7 +6,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-axios.defaults.baseURL = "http://localhost:3000/api/ttn";
+axios.defaults.baseURL = "https://nova-poshta.onrender.com";
 export default function TrackingPage() {
   const [error, setError] = useState(null);
   const [packageInfo, setPackageInfo] = useState();
